@@ -344,11 +344,14 @@ export default function NotebookScreen({
         source: payload.source,
         color: payload.color,
         pattern: payload.pattern,
+        ...(payload.kind === 'emoji' ? { material: payload.material || 'paper' } : {}),
         xFrac: (pageW / 2 + (Math.random() - 0.5) * pageW * 0.3) / pageW,
         yFrac: (pageH / 2 + (Math.random() - 0.5) * pageH * 0.3) / pageH,
-        rotation: payload.kind === 'tape' ? (Math.random() - 0.5) * 0.35 : 0,
+        // A slight random angle makes stickers feel hand-placed.
+        rotation: (Math.random() - 0.5) * (payload.kind === 'tape' ? 0.35 : 0.3),
         scale: 1,
         z: Date.now(),
+        addedAt: Date.now(),
       };
       updatePageAt(activeIndex, (p) => ({ ...p, stickers: [...(p.stickers || []), sticker] }));
     },
