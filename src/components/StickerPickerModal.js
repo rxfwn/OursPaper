@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { STICKER_CATEGORIES, WASHI_TAPES } from '../theme/stickers';
+import { STICKER_CATEGORIES, WASHI_TAPES, STICKER_MATERIALS, DEFAULT_STICKER_MATERIAL } from '../theme/stickers';
+import StickerFace from './StickerFace';
 
 const TABS = [
   ...STICKER_CATEGORIES.map((c) => ({ id: c.id, label: c.label, kind: 'emoji', items: c.emojis })),
@@ -9,6 +10,7 @@ const TABS = [
 
 export default function StickerPickerModal({ visible, initialTab, onClose, onSelect }) {
   const [tabId, setTabId] = useState(TABS[0].id);
+  const [material, setMaterial] = useState(DEFAULT_STICKER_MATERIAL);
 
   useEffect(() => {
     if (visible && initialTab && TABS.some((t) => t.id === initialTab)) {
@@ -36,15 +38,30 @@ export default function StickerPickerModal({ visible, initialTab, onClose, onSel
             ))}
           </ScrollView>
 
+          {tab.kind === 'emoji' && (
+            <View style={styles.materialRow}>
+              <Text style={styles.materialLabel}>Matière</Text>
+              {STICKER_MATERIALS.map((m) => (
+                <Pressable
+                  key={m.id}
+                  onPress={() => setMaterial(m.id)}
+                  style={[styles.materialChip, material === m.id && styles.materialChipActive]}
+                >
+                  <Text style={[styles.materialText, material === m.id && styles.materialTextActive]}>{m.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+          )}
+
           <View style={styles.grid}>
             {tab.kind === 'emoji'
               ? tab.items.map((emoji) => (
                   <Pressable
                     key={emoji}
                     style={styles.emojiButton}
-                    onPress={() => onSelect({ kind: 'emoji', emoji })}
+                    onPress={() => onSelect({ kind: 'emoji', emoji, material })}
                   >
-                    <Text style={styles.emoji}>{emoji}</Text>
+                    {visible && <StickerFace emoji={emoji} material={material} box={44} fontSize={28} />}
                   </Pressable>
                 ))
               : tab.items.map((t) => (
@@ -124,12 +141,39 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(242,233,216,0.10)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emoji: {
-    fontSize: 28,
+  materialRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: 14,
+  },
+  materialLabel: {
+    color: 'rgba(255,255,255,0.45)',
+    fontSize: 12,
+    marginRight: 2,
+  },
+  materialChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  materialChipActive: {
+    backgroundColor: '#f2e9d8',
+  },
+  materialText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  materialTextActive: {
+    color: '#28292b',
   },
   tapeButton: {
     width: 64,

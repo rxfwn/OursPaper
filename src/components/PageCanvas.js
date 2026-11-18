@@ -12,6 +12,9 @@ import ColorPicker from './ColorPicker';
 import { strokeNearPoint } from '../utils/geometry';
 import { normalizePoints, denormalizePoints } from '../utils/normalize';
 import { TEXT_FONTS, TEXT_SIZES, HIGHLIGHT_COLOR } from '../theme/textFonts';
+import { stickerMaterial, nextStickerMaterial, STICKER_MATERIALS } from '../theme/stickers';
+
+const MATERIAL_ICON = { paper: '📄', gloss: '💧', holo: '🌈', glitter: '✨' };
 
 const ERASE_RADIUS = 16;
 
@@ -245,6 +248,16 @@ export default function PageCanvas({
     },
     [onUpdatePage]
   );
+  const handleStickerMaterialCycle = useCallback(
+    (id) => {
+      onUpdatePage((p) => ({
+        ...p,
+        stickers: (p.stickers || []).map((s) => (s.id === id ? { ...s, material: nextStickerMaterial(stickerMaterial(s)) } : s)),
+      }));
+    },
+    [onUpdatePage]
+  );
+
   const handleStickerDelete = useCallback(
     (id) => {
       onUpdatePage((p) => ({ ...p, stickers: (p.stickers || []).filter((s) => s.id !== id) }));
@@ -556,6 +569,16 @@ export default function PageCanvas({
       )}
       {!disabled && selectedSticker && (
         <View style={[styles.photoControlsGroup, styles.photoControls]} pointerEvents="box-none">
+          {selectedSticker.kind !== 'tape' && selectedSticker.kind !== 'image' && (
+            <Pressable
+              style={styles.controlButton}
+              onPress={() => handleStickerMaterialCycle(selectedSticker.id)}
+              hitSlop={8}
+              accessibilityLabel={`Matière : ${STICKER_MATERIALS.find((m) => m.id === stickerMaterial(selectedSticker))?.label}`}
+            >
+              <Text style={styles.controlIcon}>{MATERIAL_ICON[stickerMaterial(selectedSticker)]}</Text>
+            </Pressable>
+          )}
           <Pressable style={styles.controlButton} onPress={() => handleZOrder('sticker', selectedSticker.id, 'front')} hitSlop={8}>
             <Text style={styles.controlIcon}>⤒</Text>
           </Pressable>

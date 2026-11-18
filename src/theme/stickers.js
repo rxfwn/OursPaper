@@ -46,3 +46,29 @@ export const WASHI_TAPES = [
   { id: 'blush', color: '#e3a8bb', pattern: 'stripe' },
   { id: 'kraft', color: '#c8a878', pattern: 'solid' },
 ];
+
+// Sticker "materials" — how an emoji sticker is printed. Each one is a
+// different die-cut finish rendered on the fly (SVG filters + lighting on
+// web, a simpler approximation on native), so no image asset is involved.
+//  - paper:  matte die-cut sticker with a white border
+//  - gloss:  glossy vinyl, a bright highlight follows the light
+//  - holo:   holographic foil, rainbow sheen that shifts with the light
+//  - glitter: silver glitter border that sparkles
+export const STICKER_MATERIALS = [
+  { id: 'paper', label: 'Papier' },
+  { id: 'gloss', label: 'Vinyle' },
+  { id: 'holo', label: 'Holo' },
+  { id: 'glitter', label: 'Paillettes' },
+];
+
+export const DEFAULT_STICKER_MATERIAL = 'paper';
+
+export function stickerMaterial(sticker) {
+  const id = sticker?.material;
+  return STICKER_MATERIALS.some((m) => m.id === id) ? id : DEFAULT_STICKER_MATERIAL;
+}
+
+export function nextStickerMaterial(id) {
+  const i = STICKER_MATERIALS.findIndex((m) => m.id === id);
+  return STICKER_MATERIALS[(i + 1) % STICKER_MATERIALS.length].id;
+}
